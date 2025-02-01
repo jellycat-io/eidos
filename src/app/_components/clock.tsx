@@ -14,7 +14,7 @@ export function Clock() {
   })
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2">
+    <div className="flex flex-col items-center justify-center gap-4">
       <span className="text-lg text-muted-foreground">The time is now</span>
       <div className="flex items-center gap-2">
         <TimeContainer
@@ -33,7 +33,7 @@ export function Clock() {
 
 function TimeContainer({ value }: { value: string }) {
   return (
-    <div className="bg-accent text-accent-foreground flex items-center justify-center size-24 text-7xl rounded-md font-bold">
+    <div className="bg-primary text-primary-foreground flex items-center justify-center size-24 text-7xl rounded-lg font-bold">
       {value}
     </div>
   )

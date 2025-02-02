@@ -1,4 +1,5 @@
 import { Offside } from "next/font/google"
+import Link from "next/link"
 
 const copseSans = Offside({
   subsets: ["latin"],
@@ -7,10 +8,12 @@ const copseSans = Offside({
 
 export function Logo() {
   return (
-    <span
-      className={`${copseSans.className} bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent text-4xl`}
-    >
-      Eidos
-    </span>
+    <Link href="/">
+      <span
+        className={`${copseSans.className} bg-gradient-to-r from-indigo-300 to-blue-500 bg-clip-text text-transparent text-4xl`}
+      >
+        Eidos
+      </span>
+    </Link>
   )
 }

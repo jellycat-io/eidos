@@ -3,7 +3,7 @@ import { initTRPC } from "@trpc/server"
 import SuperJSON from "superjson"
 import { ZodError } from "zod"
 
-import { db } from "./db"
+import { db } from "../db"
 
 export async function createTRPCContext(opts: { headers: Headers }) {
   const user = await auth()

@@ -1,5 +1,7 @@
 import type { NextConfig } from "next"
 
+import "./src/lib/env.ts"
+
 const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,

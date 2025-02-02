@@ -8,6 +8,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { TRPCReactProvider } from "@/trpc/react"
 
+import { Toaster } from "@/components/ui/toaster"
 import { Navbar } from "@/components/navbar"
 
 const fontSans = DM_Sans({ subsets: ["latin"] })
@@ -33,8 +34,11 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TRPCReactProvider>
-              <Navbar />
-              {children}
+              <div className="flex flex-col min-h-screen min-w-full bg-background max-w-screen">
+                <Navbar />
+                <main className="flex w-full flex-grow">{children}</main>
+              </div>
+              <Toaster />
             </TRPCReactProvider>
           </ThemeProvider>
         </body>

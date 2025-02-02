@@ -1,7 +1,8 @@
-import { createCallerFactory, createTRPCRouter, publicProcedure } from "./trpc"
+import { formRouter } from "./routers/form-router"
+import { createCallerFactory, createTRPCRouter } from "./trpc"
 
 export const appRouter = createTRPCRouter({
-  ping: publicProcedure.query(() => "pong"),
+  form: formRouter,
 })
 
 export type AppRouter = typeof appRouter

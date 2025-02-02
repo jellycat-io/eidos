@@ -3,28 +3,30 @@
 import Link from "next/link"
 
 import { useUser } from "@clerk/nextjs"
-import { MenuIcon } from "lucide-react"
 
 import { Logo } from "./logo"
+import { ThemeSwitcher } from "./theme-switcher"
+import { UserButton } from "./user-button"
 
 export function Navbar() {
   const user = useUser()
   return (
-    <header className="fixed right-0 left-0 top-0 px-6 py-3 bg-black/40 backdrop-blur-lg z-[100] flex items-center border-b border-neutral-900 justify-between">
+    <header className="flex justify-between items-center border-b border-border h-[60px] px-4 py-2">
       <aside className="flex items-center">
         <Logo />
       </aside>
       <aside className="flex items-center gap-4">
         <Link
           href="/dashboard"
-          className="relative iniline-flex h-10 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
+          className="relative inline-flex h-10 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-1 focus:ring-slate-400"
         >
-          <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+          <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#3b82f6_0%,#a5b4fc_50%,#3b82f6_100%)]" />
           <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
             {user.isSignedIn ? "Dashboard" : "Get Started"}
           </span>
         </Link>
-        <MenuIcon className="md:hidden" />
+        <ThemeSwitcher />
+        <UserButton />
       </aside>
     </header>
   )

@@ -26,6 +26,7 @@ const eslintConfig = [
         },
       ],
       "import/named": "off",
+      "import/no-named-as-default": "off",
       "jsx-a11y/alt-text": "warn",
       "jsx-a11y/aria-props": "warn",
       "jsx-a11y/aria-proptypes": "warn",

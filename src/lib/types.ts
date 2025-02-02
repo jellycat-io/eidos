@@ -16,3 +16,7 @@ export const createFormSchema = z.object({
 })
 
 export type CreateFormValues = z.infer<typeof createFormSchema>
+
+export const getFormSchema = z.object({
+  id: z.string(),
+})

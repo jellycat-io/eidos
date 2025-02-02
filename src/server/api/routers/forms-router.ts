@@ -1,4 +1,4 @@
-import { createFormSchema, type FormStats } from "@/lib/types"
+import { createFormSchema, getFormSchema, type FormStats } from "@/lib/types"
 
 import { createTRPCRouter, privateProcedure } from "../trpc"
 
@@ -37,10 +37,30 @@ export const formsRouter = createTRPCRouter({
       where: {
         userId: ctx.auth.userId,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     })
 
     return forms
   }),
+
+  getFormById: privateProcedure
+    .input(getFormSchema)
+    .query(async ({ ctx, input }) => {
+      const { id } = getFormSchema.parse(input)
+      const form = await ctx.db.form.findUnique({
+        where: {
+          id,
+        },
+      })
+
+      if (!form) {
+        throw new Error(`Form not found <${id}>`)
+      }
+
+      return form
+    }),
 
   createForm: privateProcedure
     .input(createFormSchema)

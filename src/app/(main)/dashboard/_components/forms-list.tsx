@@ -84,14 +84,14 @@ function FormCard({ form }: FormCardProps) {
       </CardContent>
       <CardFooter className="mt-6">
         {form.published ? (
-          <Button variant="outline" className="w-full" asChild>
+          <Button variant="secondary" className="w-full" asChild>
             <Link href={`/forms/${form.id}`}>
               <SendIcon />
               View submissions
             </Link>
           </Button>
         ) : (
-          <Button variant="outline" className="w-full" asChild>
+          <Button variant="secondary" className="w-full" asChild>
             <Link href={`/builder/${form.id}`}>
               <PencilLineIcon />
               Edit

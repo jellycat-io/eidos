@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 import { api } from "@/trpc/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { PlusIcon, SaveIcon } from "lucide-react"
+import { FilePlus2Icon, SaveIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 
 import { createFormSchema, type CreateFormValues } from "@/lib/types"
@@ -33,6 +34,7 @@ import { LoadingButton } from "@/components/loading-button"
 export function CreateFormDialog() {
   const [open, setOpen] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
   const form = useForm<CreateFormValues>({
     resolver: zodResolver(createFormSchema),
     defaultValues: {
@@ -42,17 +44,23 @@ export function CreateFormDialog() {
   })
 
   const trpcUtils = api.useUtils()
-  const createForm = api.form.createForm.useMutation({
+  const createForm = api.forms.createForm.useMutation({
     onError: (e) => {
       console.error(e)
       toast({
         variant: "destructive",
+        title: "Error",
         description: "Failed to create form.",
       })
     },
-    onSuccess: () => {
-      trpcUtils.form.getFormSummaries.invalidate()
+    onSuccess: ({ formId }) => {
+      toast({
+        title: "Success",
+        description: "Form created successfully.",
+      })
+      trpcUtils.forms.getForms.invalidate()
       setOpen(false)
+      router.push(`/builder/${formId}`)
     },
   })
 
@@ -65,9 +73,14 @@ export function CreateFormDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="lg">
-          <PlusIcon />
-          Create new form
+        <Button
+          variant="outline"
+          className="group bg-background border border-primary/20 h-[212px] flex flex-col items-center justify-center gap-4 hover:border-primary hover:cursor-pointer border-dashed [&_svg]:size-8"
+        >
+          <FilePlus2Icon className="text-muted-foreground group-hover:text-primary" />
+          <span className="font-bold text-xl text-muted-foreground group-hover:text-primary">
+            Create new form
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -86,7 +99,11 @@ export function CreateFormDialog() {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={loading} />
+                    <Input
+                      {...field}
+                      disabled={loading}
+                      placeholder="My precious"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,7 +116,12 @@ export function CreateFormDialog() {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={5} disabled={loading} />
+                    <Textarea
+                      {...field}
+                      rows={5}
+                      disabled={loading}
+                      placeholder="A form to fill them all and in the darkness submit them"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

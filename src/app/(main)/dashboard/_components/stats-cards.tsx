@@ -1,12 +1,7 @@
 "use client"
 
 import { api } from "@/trpc/react"
-import {
-  EyeIcon,
-  MousePointerClickIcon,
-  TrendingUpIcon,
-  VolleyballIcon,
-} from "lucide-react"
+import { GhostIcon, SendIcon, TrendingUpIcon, ViewIcon } from "lucide-react"
 
 import { StatCard } from "./stat-card"
 
@@ -16,13 +11,13 @@ interface StatsCardsProps {
 
 export function StatsCards({ loading = false }: StatsCardsProps) {
   const { data: stats, isLoading: isLoadingStats } =
-    api.form.getFormStats.useQuery()
+    api.forms.getFormStats.useQuery()
 
   return (
     <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       <StatCard
         title="Total visits"
-        icon={EyeIcon}
+        icon={ViewIcon}
         description="All time form visits"
         value={stats?.visits.toLocaleString() ?? ""}
         loading={loading || isLoadingStats}
@@ -31,7 +26,7 @@ export function StatsCards({ loading = false }: StatsCardsProps) {
       />
       <StatCard
         title="Total submissions"
-        icon={MousePointerClickIcon}
+        icon={SendIcon}
         description="All time form submissions"
         value={stats?.submissions.toLocaleString() ?? ""}
         loading={loading || isLoadingStats}
@@ -49,7 +44,7 @@ export function StatsCards({ loading = false }: StatsCardsProps) {
       />
       <StatCard
         title="Bounce rate"
-        icon={VolleyballIcon}
+        icon={GhostIcon}
         description="Visits left without interaction"
         value={`${stats?.bounceRate.toLocaleString() ?? ""}%`}
         loading={loading || isLoadingStats}

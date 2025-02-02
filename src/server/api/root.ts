@@ -1,8 +1,8 @@
-import { formRouter } from "./routers/form-router"
+import { formsRouter } from "./routers/forms-router"
 import { createCallerFactory, createTRPCRouter } from "./trpc"
 
 export const appRouter = createTRPCRouter({
-  form: formRouter,
+  forms: formsRouter,
 })
 
 export type AppRouter = typeof appRouter

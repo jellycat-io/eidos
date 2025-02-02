@@ -1,8 +1,8 @@
-import { createFormSchema, type FormStats, type FormSummary } from "@/lib/types"
+import { createFormSchema, type FormStats } from "@/lib/types"
 
 import { createTRPCRouter, privateProcedure } from "../trpc"
 
-export const formRouter = createTRPCRouter({
+export const formsRouter = createTRPCRouter({
   getFormStats: privateProcedure.query(async ({ ctx }) => {
     const stats = await ctx.db.form.aggregate({
       where: {
@@ -32,21 +32,14 @@ export const formRouter = createTRPCRouter({
     } satisfies FormStats
   }),
 
-  getFormSummaries: privateProcedure.query(async ({ ctx }) => {
-    const summaries: FormSummary[] = await ctx.db.form.findMany({
+  getForms: privateProcedure.query(async ({ ctx }) => {
+    const forms = await ctx.db.form.findMany({
       where: {
         userId: ctx.auth.userId,
       },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        shareUrl: true,
-        updatedAt: true,
-      },
     })
 
-    return summaries
+    return forms
   }),
 
   createForm: privateProcedure
@@ -54,12 +47,16 @@ export const formRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { title, description } = input
 
-      await ctx.db.form.create({
+      const form = await ctx.db.form.create({
         data: {
           userId: ctx.auth.userId,
           title,
           description,
         },
       })
+
+      return {
+        formId: form.id,
+      }
     }),
 })

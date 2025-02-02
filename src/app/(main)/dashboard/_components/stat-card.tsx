@@ -26,8 +26,8 @@ export function StatCard({
   return (
     <Card className={cn("space-y-2 shadow-md", shadowClass)}>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{title}</CardTitle>
-        <Icon className={cn("size-8", iconClass)} />
+        <CardTitle className="text-xl">{title}</CardTitle>
+        <Icon className={cn("size-6", iconClass)} />
       </CardHeader>
       <CardContent>
         <div className="space-y-2">

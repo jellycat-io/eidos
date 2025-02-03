@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs"
 
 import "./globals.css"
 
+import { DesignerProvider } from "@/providers/designer-provider"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { TRPCReactProvider } from "@/trpc/react"
 
@@ -27,20 +28,22 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={`${fontSans.className} antialiased`}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <TRPCReactProvider>
-              <div className="flex flex-col min-h-screen min-w-full bg-background max-w-screen">
-                <Navbar />
-                <main className="flex w-full flex-grow">{children}</main>
-              </div>
-              <Toaster />
-            </TRPCReactProvider>
-          </ThemeProvider>
+          <TRPCReactProvider>
+            <DesignerProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <div className="flex flex-col min-h-screen min-w-full bg-background max-w-screen">
+                  <Navbar />
+                  <main className="flex w-full flex-grow">{children}</main>
+                </div>
+                <Toaster />
+              </ThemeProvider>
+            </DesignerProvider>
+          </TRPCReactProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -21,7 +21,12 @@ export const getFormSchema = z.object({
   id: z.string(),
 })
 
-export type ElementType = "TextField" | "NumberField"
+export type ElementAttributesMap = {
+  TextField: TextFieldAttributes
+  NumberField: NumberFieldAttributes
+}
+
+export type ElementType = keyof ElementAttributesMap
 
 export interface FormElement<T extends ElementType> {
   type: T
@@ -30,7 +35,7 @@ export interface FormElement<T extends ElementType> {
     label: string
   }
   construct: (id: string) => FormElementInstance<T>
-  designerComponent: React.FC
+  designerComponent: React.FC<DesignerComponentProps<T>>
   formComponent: React.FC
   propertiesComponent: React.FC
 }
@@ -41,17 +46,10 @@ export type FormElementsType = {
   [K in ElementType]: FormElement<K>
 }
 
-export interface FormElementInstance<
-  T extends keyof ElementAttributesMap = keyof ElementAttributesMap,
-> {
+export interface FormElementInstance<T extends ElementType> {
   id: string
   type: T
   extraAttributes: ElementAttributesMap[T]
-}
-
-export type ElementAttributesMap = {
-  TextField: TextFieldAttributes
-  NumberField: NumberFieldAttributes
 }
 
 export interface ElementAttributes {
@@ -66,4 +64,8 @@ export type TextFieldAttributes = ElementAttributes & {
 
 export type NumberFieldAttributes = ElementAttributes & {
   placeholder: string
+}
+
+export interface DesignerComponentProps<T extends ElementType> {
+  element: FormElementInstance<T>
 }

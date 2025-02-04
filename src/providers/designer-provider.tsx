@@ -1,11 +1,15 @@
 "use client"
 
-import { createContext, useState } from "react"
+import { createContext, Dispatch, SetStateAction, useState } from "react"
 
 import type { ElementType, FormElementInstance } from "@/lib/types"
 
 interface DesignerContextState {
   elements: FormElementInstance<ElementType>[]
+  selectedElement: FormElementInstance<ElementType> | null
+  setSelectedElement: Dispatch<
+    SetStateAction<FormElementInstance<ElementType> | null>
+  >
   addElement: (index: number, element: FormElementInstance<ElementType>) => void
   removeElement: (id: string) => void
   reorderElements: (oldIndex: number, newIndex: number) => void
@@ -17,6 +21,8 @@ export function DesignerProvider({ children }: { children: React.ReactNode }) {
   const [elements, setElements] = useState<FormElementInstance<ElementType>[]>(
     [],
   )
+  const [selectedElement, setSelectedElement] =
+    useState<FormElementInstance<ElementType> | null>(null)
 
   function addElement(
     index: number,
@@ -44,7 +50,14 @@ export function DesignerProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <DesignerContext.Provider
-      value={{ elements, addElement, removeElement, reorderElements }}
+      value={{
+        elements,
+        selectedElement,
+        setSelectedElement,
+        addElement,
+        removeElement,
+        reorderElements,
+      }}
     >
       {children}
     </DesignerContext.Provider>

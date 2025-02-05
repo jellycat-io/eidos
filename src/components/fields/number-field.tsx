@@ -45,11 +45,30 @@ export const NumberFieldFormElement: FormElement<"NumberField"> = {
     label: "Number Field",
   },
   designerComponent: DesignerComponent,
-  formComponent: () => <div>NumberField</div>,
+  formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
 }
 
 function DesignerComponent<T extends ElementType>({
+  element,
+}: DesignerComponentProps<T>) {
+  const { label, placeholder, required, helperText } = element.extraAttributes
+
+  return (
+    <div className="flex flex-col gap-3 w-full">
+      <Label>
+        {label}
+        {required && "*"}
+      </Label>
+      <Input type="number" readOnly placeholder={placeholder} />
+      {helperText && (
+        <p className="text-muted-foreground text-xs">{helperText}</p>
+      )}
+    </div>
+  )
+}
+
+function FormComponent<T extends ElementType>({
   element,
 }: DesignerComponentProps<T>) {
   const { label, placeholder, required, helperText } = element.extraAttributes
@@ -60,7 +79,7 @@ function DesignerComponent<T extends ElementType>({
         {label}
         {required && "*"}
       </Label>
-      <Input type="number" readOnly placeholder={placeholder} />
+      <Input type="number" placeholder={placeholder} />
       {helperText && (
         <p className="text-muted-foreground text-xs">{helperText}</p>
       )}

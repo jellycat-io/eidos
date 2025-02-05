@@ -125,8 +125,8 @@ export function Designer() {
           )}
         >
           {!elements.length && !droppable.isOver && (
-            <p className="text-3xl text-muted-foreground flex flex-grow items-center font-bold">
-              Drop here
+            <p className="text-xl text-muted-foreground flex flex-grow items-center font-medium">
+              Start by dropping a component here
             </p>
           )}
           {!elements.length && droppable.isOver && (

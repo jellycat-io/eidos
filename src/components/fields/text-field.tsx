@@ -44,13 +44,9 @@ export const TextFieldFormElement: FormElement<"TextField"> = {
     icon: MdTextFields,
     label: "Text Field",
   },
-  designerComponent: DesignerComponent as React.FC<
-    DesignerComponentProps<"TextField">
-  >,
-  formComponent: () => <div>TextField</div>,
-  propertiesComponent: PropertiesComponent as React.FC<
-    PropertiesComponentProps<"TextField">
-  >,
+  designerComponent: DesignerComponent,
+  formComponent: FormComponent,
+  propertiesComponent: PropertiesComponent,
 }
 
 function DesignerComponent<T extends ElementType>({
@@ -65,6 +61,25 @@ function DesignerComponent<T extends ElementType>({
         {required && " *"}
       </Label>
       <Input readOnly placeholder={placeholder} />
+      {helperText && (
+        <p className="text-muted-foreground text-xs">{helperText}</p>
+      )}
+    </div>
+  )
+}
+
+function FormComponent<T extends ElementType>({
+  element,
+}: DesignerComponentProps<T>) {
+  const { label, placeholder, required, helperText } = element.extraAttributes
+
+  return (
+    <div className="flex flex-col gap-3 w-full">
+      <Label>
+        {label}
+        {required && " *"}
+      </Label>
+      <Input placeholder={placeholder} />
       {helperText && (
         <p className="text-muted-foreground text-xs">{helperText}</p>
       )}

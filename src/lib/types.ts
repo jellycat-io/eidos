@@ -36,7 +36,7 @@ export interface FormElement<T extends ElementType> {
   }
   construct: (id: string) => FormElementInstance<T>
   designerComponent: React.FC<DesignerComponentProps<T>>
-  formComponent: React.FC
+  formComponent: React.FC<FormComponentProps<T>>
   propertiesComponent: React.FC<PropertiesComponentProps<T>>
 }
 
@@ -67,6 +67,10 @@ export type NumberFieldAttributes = ElementAttributes & {
 }
 
 export interface DesignerComponentProps<T extends ElementType> {
+  element: FormElementInstance<T>
+}
+
+export interface FormComponentProps<T extends ElementType> {
   element: FormElementInstance<T>
 }
 

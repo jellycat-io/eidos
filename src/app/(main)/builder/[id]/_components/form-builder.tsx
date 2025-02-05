@@ -42,7 +42,10 @@ export function FormBuilder({ formId }: FormBuilderProps) {
     <DndContext sensors={sensors}>
       <section className="flex flex-col w-full">
         <header className="flex justify-between items-center p-4 gap-3 border-b border-border/50">
-          <h2 className="truncate font-semibold text-lg">{form?.title}</h2>
+          <div className="flex flex-col space-y-0.5">
+            <h2 className="truncate font-bold text-lg">{form?.title}</h2>
+            <p className="text-sm text-muted-foreground">{form?.description}</p>
+          </div>
           <div className="flex items-center gap-3">
             <PreviewDialogButton />
             {!form?.published && (

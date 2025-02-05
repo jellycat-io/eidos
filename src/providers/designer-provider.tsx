@@ -11,6 +11,7 @@ interface DesignerContextState {
     SetStateAction<FormElementInstance<ElementType> | null>
   >
   addElement: (index: number, element: FormElementInstance<ElementType>) => void
+  updateElement: (id: string, element: FormElementInstance<ElementType>) => void
   removeElement: (id: string) => void
   reorderElements: (oldIndex: number, newIndex: number) => void
 }
@@ -35,6 +36,18 @@ export function DesignerProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
+  function updateElement(
+    id: string,
+    element: FormElementInstance<ElementType>,
+  ) {
+    setElements((prev) => {
+      const newElements = [...prev]
+      const index = newElements.findIndex((el) => el.id === id)
+      newElements[index] = element
+      return newElements
+    })
+  }
+
   function removeElement(id: string) {
     setElements((prev) => prev.filter((el) => el.id !== id))
   }
@@ -55,6 +68,7 @@ export function DesignerProvider({ children }: { children: React.ReactNode }) {
         selectedElement,
         setSelectedElement,
         addElement,
+        updateElement,
         removeElement,
         reorderElements,
       }}

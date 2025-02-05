@@ -1,12 +1,32 @@
-import { MdNumbers } from "react-icons/md"
+import { useEffect } from "react"
 
-import type {
-  DesignerComponentProps,
-  ElementType,
-  FormElement,
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { MdNumbers } from "react-icons/md"
+import { z } from "zod"
+
+import {
+  optionalString,
+  PropertiesComponentProps,
+  requiredString,
+  type DesignerComponentProps,
+  type ElementType,
+  type FormElement,
 } from "@/lib/types"
+import { useDesigner } from "@/hooks/use-designer"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
 
 export const NumberFieldFormElement: FormElement<"NumberField"> = {
   type: "NumberField",
@@ -24,11 +44,9 @@ export const NumberFieldFormElement: FormElement<"NumberField"> = {
     icon: MdNumbers,
     label: "Number Field",
   },
-  designerComponent: DesignerComponent as React.FC<
-    DesignerComponentProps<"NumberField">
-  >,
+  designerComponent: DesignerComponent,
   formComponent: () => <div>NumberField</div>,
-  propertiesComponent: () => <div>NumberField</div>,
+  propertiesComponent: PropertiesComponent,
 }
 
 function DesignerComponent<T extends ElementType>({
@@ -47,5 +65,132 @@ function DesignerComponent<T extends ElementType>({
         <p className="text-muted-foreground text-xs">{helperText}</p>
       )}
     </div>
+  )
+}
+
+const propertiesFormSchema = z.object({
+  label: requiredString,
+  helperText: optionalString,
+  required: z.boolean().default(false).optional(),
+  placeholder: optionalString,
+})
+
+type PropertiesFormValues = z.infer<typeof propertiesFormSchema>
+
+function PropertiesComponent<T extends ElementType>({
+  element,
+}: PropertiesComponentProps<T>) {
+  const { updateElement } = useDesigner()
+  const form = useForm<PropertiesFormValues>({
+    mode: "onBlur",
+    resolver: zodResolver(propertiesFormSchema),
+    defaultValues: {
+      ...element.extraAttributes,
+    },
+  })
+
+  useEffect(() => form.reset(element.extraAttributes), [element, form])
+
+  function applyChanges(values: PropertiesFormValues) {
+    updateElement(element.id, {
+      ...element,
+      extraAttributes: {
+        ...values,
+      },
+    })
+  }
+
+  return (
+    <Form {...form}>
+      <form className="space-y-6" onBlur={form.handleSubmit(applyChanges)}>
+        <FormField
+          control={form.control}
+          name="label"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Label</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.currentTarget.blur()
+                  }}
+                />
+              </FormControl>
+              <FormDescription>
+                The label of the field. It will be displayed above the field.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="placeholder"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Placeholder</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.currentTarget.blur()
+                  }}
+                />
+              </FormControl>
+              <FormDescription>The placeholder of the field.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="helperText"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Helper text</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  rows={3}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.currentTarget.blur()
+                  }}
+                />
+              </FormControl>
+              <FormDescription>
+                The helper text of the field. It will be displayed below the
+                field.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="required"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between rounded-lg gap-2 border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel>Required</FormLabel>
+                <FormDescription>
+                  Whether or not this field required.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  onKeyDown={(e) => {
+                    if (e.key === "Space") e.currentTarget.blur()
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </form>
+    </Form>
   )
 }

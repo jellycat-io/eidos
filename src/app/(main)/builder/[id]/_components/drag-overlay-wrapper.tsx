@@ -28,11 +28,7 @@ export function DragOverlayWrapper() {
   const isSidebarBtnElement = draggedItem.data?.current?.isDesignerBtnElement
   const type = draggedItem.data?.current?.type as ElementType
   if (isSidebarBtnElement) {
-    node = (
-      <SidebarElementButtonDragOverlay
-        formElement={FORM_ELEMENTS[type] as FormElement<typeof type>}
-      />
-    )
+    node = <SidebarElementButtonDragOverlay element={FORM_ELEMENTS[type]} />
   }
 
   const isDesignerComponent = draggedItem.data?.current?.isDesignerComponent

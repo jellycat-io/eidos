@@ -37,10 +37,10 @@ export interface FormElement<T extends ElementType> {
   construct: (id: string) => FormElementInstance<T>
   designerComponent: React.FC<DesignerComponentProps<T>>
   formComponent: React.FC
-  propertiesComponent: React.FC
+  propertiesComponent: React.FC<PropertiesComponentProps<T>>
 }
 
-export type AnyFormElement = FormElement<ElementType>
+export type AnyFormElement = { [K in ElementType]: FormElement<K> }[ElementType]
 
 export type FormElementsType = {
   [K in ElementType]: FormElement<K>
@@ -54,18 +54,22 @@ export interface FormElementInstance<T extends ElementType> {
 
 export interface ElementAttributes {
   label: string
-  helperText: string
-  required: boolean
+  helperText?: string
+  required?: boolean
 }
 
 export type TextFieldAttributes = ElementAttributes & {
-  placeholder: string
+  placeholder?: string
 }
 
 export type NumberFieldAttributes = ElementAttributes & {
-  placeholder: string
+  placeholder?: string
 }
 
 export interface DesignerComponentProps<T extends ElementType> {
+  element: FormElementInstance<T>
+}
+
+export interface PropertiesComponentProps<T extends ElementType> {
   element: FormElementInstance<T>
 }

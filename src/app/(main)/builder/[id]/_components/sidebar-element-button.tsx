@@ -2,26 +2,24 @@
 
 import { useDraggable } from "@dnd-kit/core"
 
-import type { ElementType, FormElement } from "@/lib/types"
+import type { AnyFormElement } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
-interface SidebarElementButtonProps<T extends ElementType> {
-  formElement: FormElement<T>
+interface SidebarElementButtonProps {
+  element: AnyFormElement
 }
 
-export function SidebarElementButton<T extends ElementType>({
-  formElement,
-}: SidebarElementButtonProps<T>) {
+export function SidebarElementButton({ element }: SidebarElementButtonProps) {
   const draggable = useDraggable({
-    id: `designer-btn-${formElement.type}`,
+    id: `designer-btn-${element.type}`,
     data: {
-      type: formElement.type,
+      type: element.type,
       isDesignerBtnElement: true,
     },
   })
 
-  const { label, icon: Icon } = formElement.buttonComponent
+  const { label, icon: Icon } = element.buttonComponent
 
   return (
     <Button
@@ -40,10 +38,10 @@ export function SidebarElementButton<T extends ElementType>({
   )
 }
 
-export function SidebarElementButtonDragOverlay<T extends ElementType>({
-  formElement,
-}: SidebarElementButtonProps<T>) {
-  const { label, icon: Icon } = formElement.buttonComponent
+export function SidebarElementButtonDragOverlay({
+  element: element,
+}: SidebarElementButtonProps) {
+  const { label, icon: Icon } = element.buttonComponent
 
   return (
     <Button

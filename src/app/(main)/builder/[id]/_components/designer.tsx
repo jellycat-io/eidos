@@ -21,8 +21,13 @@ import { Clickable } from "@/components/ui/clickable"
 import { DesignerSidebar } from "./designer-sidebar"
 
 export function Designer() {
-  const { elements, addElement, selectedElement, setSelectedElement } =
-    useDesigner()
+  const {
+    elements,
+    addElement,
+    reorderElements,
+    selectedElement,
+    setSelectedElement,
+  } = useDesigner()
   const droppable = useDroppable({
     id: "designer-drop-area",
     data: {
@@ -35,13 +40,70 @@ export function Designer() {
       const { active, over } = e
       if (!active || !over) return
 
-      const isDesignerBtnElement = active.data?.current?.isDesignerBtnElement
-      if (isDesignerBtnElement) {
+      const isActiveDesignerBtnElement =
+        active.data?.current?.isDesignerBtnElement
+      const isOverDropArea = over.data?.current?.isDesignerDropArea
+
+      // Dropping a sidebar element in the drop area
+      if (isActiveDesignerBtnElement && isOverDropArea) {
         const type = active.data?.current?.type
         const newElement =
           FORM_ELEMENTS[type as ElementType].construct(generateId())
 
-        addElement(0, newElement)
+        addElement(elements.length, newElement)
+        return
+      }
+
+      const isOverDesignerComponentTop =
+        over.data?.current?.isDesignerComponentTop
+      const isOverDesignerComponentBottom =
+        over.data?.current?.isDesignerComponentBottom
+      const isOverDesignerComponent =
+        isOverDesignerComponentTop || isOverDesignerComponentBottom
+
+      // Dropping a sidebar button on a designer component
+      if (isActiveDesignerBtnElement && isOverDesignerComponent) {
+        const type = active.data?.current?.type
+        const newElement =
+          FORM_ELEMENTS[type as ElementType].construct(generateId())
+
+        const overId = over.data?.current?.elementId
+        const overIndex = elements.findIndex((el) => el.id === overId)
+        if (overIndex === -1) throw new Error("Element not found")
+
+        let newElementIndex = overIndex
+        if (isOverDesignerComponentBottom) {
+          newElementIndex = overIndex + 1
+        }
+
+        addElement(newElementIndex, newElement)
+        return
+      }
+
+      const isActiveDesignerComponent =
+        active.data?.current?.isDesignerComponent
+
+      // Reordering designer components
+      if (isActiveDesignerComponent && isOverDesignerComponent) {
+        const activeId = active.data?.current?.elementId
+        const overId = over.data?.current?.elementId
+
+        const activeIndex = elements.findIndex((el) => el.id === activeId)
+        const overIndex = elements.findIndex((el) => el.id === overId)
+        if (activeIndex === -1 || overIndex === -1)
+          throw new Error("Element not found")
+
+        reorderElements(activeIndex, overIndex)
+      }
+
+      // Dropping designer component in the drop area
+      if (isActiveDesignerComponent && isOverDropArea) {
+        const activeId = active.data?.current?.elementId
+
+        const activeIndex = elements.findIndex((el) => el.id === activeId)
+        if (activeIndex === -1) throw new Error("Element not found")
+
+        reorderElements(activeIndex, elements.length)
       }
     },
   })
@@ -101,7 +163,7 @@ function DesignerComponentWrapper<T extends ElementType>({
     data: {
       type: element.type,
       elementId: element.id,
-      isTopHalfDesignerComponent: true,
+      isDesignerComponentTop: true,
     },
   })
 
@@ -110,7 +172,7 @@ function DesignerComponentWrapper<T extends ElementType>({
     data: {
       type: element.type,
       elementId: element.id,
-      isBottomHalfDesignerComponent: true,
+      isDesignerComponentBottom: true,
     },
   })
 

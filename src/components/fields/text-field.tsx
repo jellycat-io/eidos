@@ -6,13 +6,12 @@ import { MdTextFields } from "react-icons/md"
 import { z } from "zod"
 
 import {
-  optionalString,
-  requiredString,
   type DesignerComponentProps,
   type ElementType,
   type FormElement,
   type PropertiesComponentProps,
 } from "@/lib/types"
+import { optionalString, requiredString } from "@/lib/validation"
 import { useDesigner } from "@/hooks/use-designer"
 import {
   Form,

@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { FilePlus2Icon, SaveIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 
-import { createFormSchema, type CreateFormValues } from "@/lib/types"
+import { createFormSchema, type CreateFormValues } from "@/lib/validation"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import {

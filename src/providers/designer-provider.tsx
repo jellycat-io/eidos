@@ -6,6 +6,7 @@ import type { ElementType, FormElementInstance } from "@/lib/types"
 
 interface DesignerContextState {
   elements: FormElementInstance<ElementType>[]
+  setElements: Dispatch<SetStateAction<FormElementInstance<ElementType>[]>>
   selectedElement: FormElementInstance<ElementType> | null
   setSelectedElement: Dispatch<
     SetStateAction<FormElementInstance<ElementType> | null>
@@ -65,6 +66,7 @@ export function DesignerProvider({ children }: { children: React.ReactNode }) {
     <DesignerContext.Provider
       value={{
         elements,
+        setElements,
         selectedElement,
         setSelectedElement,
         addElement,

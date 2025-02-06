@@ -1,25 +1,17 @@
 import { z } from "zod"
 
+import {
+  ElementAttributesSchema,
+  NumberFieldAttributesSchema,
+  TextFieldAttributesSchema,
+} from "./validation"
+
 export interface FormStats {
   visits: number
   submissions: number
   submissionRate: number
   bounceRate: number
 }
-
-export const requiredString = z.string().min(1, "Required").trim()
-export const optionalString = z.string().trim().optional()
-
-export const createFormSchema = z.object({
-  title: requiredString,
-  description: optionalString,
-})
-
-export type CreateFormValues = z.infer<typeof createFormSchema>
-
-export const getFormSchema = z.object({
-  id: z.string(),
-})
 
 export type ElementAttributesMap = {
   TextField: TextFieldAttributes
@@ -52,19 +44,9 @@ export interface FormElementInstance<T extends ElementType> {
   extraAttributes: ElementAttributesMap[T]
 }
 
-export interface ElementAttributes {
-  label: string
-  helperText?: string
-  required?: boolean
-}
-
-export type TextFieldAttributes = ElementAttributes & {
-  placeholder?: string
-}
-
-export type NumberFieldAttributes = ElementAttributes & {
-  placeholder?: string
-}
+export type ElementAttributes = z.infer<typeof ElementAttributesSchema>
+export type TextFieldAttributes = z.infer<typeof TextFieldAttributesSchema>
+export type NumberFieldAttributes = z.infer<typeof NumberFieldAttributesSchema>
 
 export interface DesignerComponentProps<T extends ElementType> {
   element: FormElementInstance<T>

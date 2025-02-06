@@ -6,13 +6,12 @@ import { MdNumbers } from "react-icons/md"
 import { z } from "zod"
 
 import {
-  optionalString,
   PropertiesComponentProps,
-  requiredString,
   type DesignerComponentProps,
   type ElementType,
   type FormElement,
 } from "@/lib/types"
+import { optionalString, requiredString } from "@/lib/validation"
 import { useDesigner } from "@/hooks/use-designer"
 import {
   Form,

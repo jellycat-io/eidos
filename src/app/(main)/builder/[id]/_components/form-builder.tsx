@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect } from "react"
+
 import { api } from "@/trpc/react"
 import {
   DndContext,
@@ -8,7 +10,9 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
+import { LoaderCircleIcon } from "lucide-react"
 
+import { useDesigner } from "@/hooks/use-designer"
 import { PreviewDialogButton } from "@/components/preview-dialog"
 import { PublishFormButton } from "@/components/publish-form-button"
 import { SaveFormButton } from "@/components/save-form-button"
@@ -21,7 +25,10 @@ interface FormBuilderProps {
 }
 
 export function FormBuilder({ formId }: FormBuilderProps) {
-  const { data: form } = api.forms.getFormById.useQuery({ id: formId })
+  const { data: form, isLoading } = api.forms.getFormById.useQuery({
+    id: formId,
+  })
+  const { setElements } = useDesigner()
 
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -38,6 +45,19 @@ export function FormBuilder({ formId }: FormBuilderProps) {
 
   const sensors = useSensors(mouseSensor, touchSensor)
 
+  useEffect(() => {
+    if (form) {
+      setElements(JSON.parse(form?.content))
+    }
+  }, [form, setElements])
+
+  if (!form || isLoading)
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center">
+        <LoaderCircleIcon className="size-12 shrink-0 text-accent animate-spin" />
+      </div>
+    )
+
   return (
     <DndContext sensors={sensors}>
       <section className="flex flex-col w-full">
@@ -50,7 +70,7 @@ export function FormBuilder({ formId }: FormBuilderProps) {
             <PreviewDialogButton />
             {!form?.published && (
               <>
-                <SaveFormButton />
+                <SaveFormButton formId={form.id} />
                 <PublishFormButton />
               </>
             )}

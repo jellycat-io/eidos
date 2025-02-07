@@ -46,7 +46,7 @@ export function SaveFormButton({ formId }: SaveFormButtonProps) {
       loading={saveForm.isPending}
       onClick={handleClick}
     >
-      Save
+      {saveForm.isPending ? "Saving..." : "Save"}
     </LoadingButton>
   )
 }

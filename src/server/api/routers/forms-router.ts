@@ -2,6 +2,7 @@ import { type FormStats } from "@/lib/types"
 import {
   createFormSchema,
   getFormSchema,
+  publishFormSchema,
   saveFormSchema,
 } from "@/lib/validation"
 
@@ -91,9 +92,20 @@ export const formsRouter = createTRPCRouter({
       const { id, content } = input
 
       await ctx.db.form.update({
-        where: { id },
+        where: { id, userId: ctx.auth.userId },
         data: {
           content,
+        },
+      })
+    }),
+
+  publishForm: privateProcedure
+    .input(publishFormSchema)
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.form.update({
+        where: { id: input.id, userId: ctx.auth.userId },
+        data: {
+          published: true,
         },
       })
     }),

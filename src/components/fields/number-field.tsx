@@ -1,16 +1,19 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { MdNumbers } from "react-icons/md"
-import { z } from "zod"
+import { z, ZodError } from "zod"
 
 import {
+  FormComponentProps,
+  FormElementInstance,
   PropertiesComponentProps,
   type DesignerComponentProps,
   type ElementType,
   type FormElement,
 } from "@/lib/types"
+import { cn } from "@/lib/utils"
 import { optionalString, requiredString } from "@/lib/validation"
 import { useDesigner } from "@/hooks/use-designer"
 import {
@@ -46,6 +49,29 @@ export const NumberFieldFormElement: FormElement<"NumberField"> = {
   designerComponent: DesignerComponent,
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
+  validate: (element: FormElementInstance<ElementType>, value: string) => {
+    try {
+      z.string()
+        .refine(
+          (val) => {
+            const trimmed = val.trim()
+            if (trimmed === "" && !element.extraAttributes.required) {
+              return true
+            }
+            const regex = /^-?\d+(\.\d+)?$/
+            return regex.test(trimmed)
+          },
+          { message: "Value must be a number" },
+        )
+        .parse(value)
+      return null
+    } catch (e) {
+      if (e instanceof ZodError) {
+        return e.errors.map((err) => err.message).join(", ")
+      }
+      return "Error"
+    }
+  },
 }
 
 function DesignerComponent<T extends ElementType>({
@@ -69,17 +95,40 @@ function DesignerComponent<T extends ElementType>({
 
 function FormComponent<T extends ElementType>({
   element,
-}: DesignerComponentProps<T>) {
+  defaultValue,
+  onChange,
+  error: formError,
+}: FormComponentProps<T>) {
   const { label, placeholder, required, helperText } = element.extraAttributes
+  const [value, setValue] = useState(defaultValue || "")
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => setError(formError ?? null), [formError])
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Label>
+      <Label className={cn(!!error && "text-destructive")}>
         {label}
-        {required && "*"}
+        {required && " *"}
       </Label>
-      <Input type="number" placeholder={placeholder} />
-      {helperText && (
+      <Input
+        type="number"
+        placeholder={placeholder}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={(e) => {
+          if (!onChange) return
+          onChange(element.id, e.target.value)
+          const error = NumberFieldFormElement.validate(
+            element as FormElementInstance<"NumberField">,
+            e.target.value,
+          )
+          setError(error)
+        }}
+        value={value}
+        className={cn(!!error && "border-destructive")}
+      />
+      {error && <p className="text-destructive text-xs">{error}</p>}
+      {!error && helperText && (
         <p className="text-muted-foreground text-xs">{helperText}</p>
       )}
     </div>

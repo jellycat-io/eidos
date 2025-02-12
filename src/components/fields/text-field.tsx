@@ -1,16 +1,19 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { MdTextFields } from "react-icons/md"
-import { z } from "zod"
+import { z, ZodError } from "zod"
 
 import {
+  FormComponentProps,
+  FormElementInstance,
   type DesignerComponentProps,
   type ElementType,
   type FormElement,
   type PropertiesComponentProps,
 } from "@/lib/types"
+import { cn } from "@/lib/utils"
 import { optionalString, requiredString } from "@/lib/validation"
 import { useDesigner } from "@/hooks/use-designer"
 import {
@@ -46,6 +49,23 @@ export const TextFieldFormElement: FormElement<"TextField"> = {
   designerComponent: DesignerComponent,
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
+  validate: (element, value) => {
+    try {
+      z.string()
+        .refine(
+          (val) => !element.extraAttributes.required || val.trim().length > 0,
+          { message: "Required" },
+        )
+        .parse(value)
+      return null
+    } catch (e) {
+      if (e instanceof ZodError) {
+        return e.errors.map((e) => e.message).join(", ")
+      }
+
+      return "Error"
+    }
+  },
 }
 
 function DesignerComponent<T extends ElementType>({
@@ -69,17 +89,40 @@ function DesignerComponent<T extends ElementType>({
 
 function FormComponent<T extends ElementType>({
   element,
-}: DesignerComponentProps<T>) {
+  defaultValue,
+  onChange,
+  error: formError,
+}: FormComponentProps<T>) {
   const { label, placeholder, required, helperText } = element.extraAttributes
+  const [value, setValue] = useState(defaultValue || "")
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => setError(formError ?? null), [formError])
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <Label>
+      <Label className={cn(!!error && "text-destructive")}>
         {label}
         {required && " *"}
       </Label>
-      <Input placeholder={placeholder} />
-      {helperText && (
+      <Input
+        placeholder={placeholder}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={(e) => {
+          if (!onChange) return
+          onChange(element.id, e.target.value)
+
+          const error = TextFieldFormElement.validate(
+            element as FormElementInstance<"TextField">,
+            e.target.value,
+          )
+          setError(error)
+        }}
+        value={value}
+        className={cn(!!error && "border-destructive")}
+      />
+      {error && <p className="text-destructive text-xs">{error}</p>}
+      {!error && helperText && (
         <p className="text-muted-foreground text-xs">{helperText}</p>
       )}
     </div>

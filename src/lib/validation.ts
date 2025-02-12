@@ -56,6 +56,15 @@ export const getFormSchema = z.object({
   id: z.string(),
 })
 
+export const getFormByUrlSchema = z.object({
+  url: z.string(),
+})
+
 export const publishFormSchema = z.object({
   id: z.string(),
+})
+
+export const submitFormSchema = z.object({
+  shareUrl: requiredString,
+  content: requiredString,
 })

@@ -1,12 +1,14 @@
-import { type FormStats } from "@/lib/types"
+import { ElementType, FormElementInstance, type FormStats } from "@/lib/types"
 import {
   createFormSchema,
+  getFormByUrlSchema,
   getFormSchema,
   publishFormSchema,
   saveFormSchema,
+  submitFormSchema,
 } from "@/lib/validation"
 
-import { createTRPCRouter, privateProcedure } from "../trpc"
+import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc"
 
 export const formsRouter = createTRPCRouter({
   getFormStats: privateProcedure.query(async ({ ctx }) => {
@@ -51,6 +53,44 @@ export const formsRouter = createTRPCRouter({
     return forms
   }),
 
+  getSingleFormStats: privateProcedure
+    .input(getFormSchema)
+    .query(async ({ ctx, input }) => {
+      const { id } = getFormSchema.parse(input)
+
+      const stats = await ctx.db.form.findUnique({
+        where: {
+          id,
+          userId: ctx.auth.userId,
+        },
+        select: {
+          visits: true,
+          submissions: true,
+        },
+      })
+
+      if (!stats) {
+        throw new Error("Form not found")
+      }
+
+      const visits = stats.visits ?? 0
+      const submissions = stats.submissions ?? 0
+
+      let submissionRate = 0
+      if (visits > 0) {
+        submissionRate = (submissions / visits) * 100
+      }
+
+      const bounceRate = 100 - submissionRate
+
+      return {
+        visits,
+        submissions,
+        submissionRate,
+        bounceRate,
+      } satisfies FormStats
+    }),
+
   getFormById: privateProcedure
     .input(getFormSchema)
     .query(async ({ ctx, input }) => {
@@ -67,6 +107,44 @@ export const formsRouter = createTRPCRouter({
 
       return form
     }),
+
+  getFormByUrl: publicProcedure.input(getFormByUrlSchema).query(
+    async ({
+      ctx,
+      input,
+    }): Promise<{
+      title: string
+      elements: FormElementInstance<ElementType>[]
+    }> => {
+      const { url } = getFormByUrlSchema.parse(input)
+
+      const form = await ctx.db.form.update({
+        where: {
+          shareUrl: url,
+        },
+        select: {
+          title: true,
+          content: true,
+        },
+        data: {
+          visits: {
+            increment: 1,
+          },
+        },
+      })
+
+      if (!form) {
+        throw new Error("Form not found")
+      }
+
+      return {
+        title: form.title,
+        elements: JSON.parse(
+          form.content,
+        ) satisfies FormElementInstance<ElementType>[],
+      }
+    },
+  ),
 
   createForm: privateProcedure
     .input(createFormSchema)
@@ -106,6 +184,25 @@ export const formsRouter = createTRPCRouter({
         where: { id: input.id, userId: ctx.auth.userId },
         data: {
           published: true,
+        },
+      })
+    }),
+
+  submitForm: publicProcedure
+    .input(submitFormSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { shareUrl, content } = input
+      await ctx.db.form.update({
+        where: { shareUrl, published: true },
+        data: {
+          submissions: {
+            increment: 1,
+          },
+          formSubmissions: {
+            create: {
+              content,
+            },
+          },
         },
       })
     }),

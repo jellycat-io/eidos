@@ -85,7 +85,7 @@ function FormCard({ form }: FormCardProps) {
       <CardFooter className="mt-6">
         {form.published ? (
           <Button variant="secondary" className="w-full" asChild>
-            <Link href={`/forms/${form.id}`}>
+            <Link href={`/form/${form.id}`}>
               <SendIcon />
               View submissions
             </Link>

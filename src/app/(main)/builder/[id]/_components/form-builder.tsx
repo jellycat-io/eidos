@@ -16,12 +16,12 @@ import {
   ArrowRightIcon,
   CopyCheckIcon,
   CopyIcon,
-  LoaderCircleIcon,
 } from "lucide-react"
 import Confetti from "react-confetti"
 
 import { useDesigner } from "@/hooks/use-designer"
 import { Button } from "@/components/ui/button"
+import { Loader } from "@/components/loader"
 import { PreviewDialogButton } from "@/components/preview-dialog"
 import { PublishFormButton } from "@/components/publish-form-button"
 import { SaveFormButton } from "@/components/save-form-button"
@@ -61,12 +61,7 @@ export function FormBuilder({ formId }: FormBuilderProps) {
     }
   }, [form, setElements])
 
-  if (!form || isLoading)
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center">
-        <LoaderCircleIcon className="size-12 shrink-0 text-accent animate-spin" />
-      </div>
-    )
+  if (!form || isLoading) return <Loader />
 
   const shareUrl = `${window.location.origin}/submit/${form.shareUrl}`
 
@@ -124,7 +119,7 @@ export function FormBuilder({ formId }: FormBuilderProps) {
                 </Link>
               </Button>
               <Button variant="ghost" asChild>
-                <Link href={`/forms/${form.id}`}>
+                <Link href={`/form/${form.id}`}>
                   Go to form details
                   <ArrowRightIcon />
                 </Link>
@@ -139,9 +134,9 @@ export function FormBuilder({ formId }: FormBuilderProps) {
   return (
     <DndContext sensors={sensors}>
       <section className="flex flex-col w-full">
-        <header className="flex justify-between items-center p-4 gap-3 border-b border-border/50">
+        <header className="flex justify-between items-center p-4 gap-3 border-b border-muted">
           <div className="flex flex-col space-y-0.5">
-            <h2 className="truncate font-bold text-lg">{form?.title}</h2>
+            <h2 className="truncate font-bold text-xl">{form?.title}</h2>
             <p className="text-sm text-muted-foreground">{form?.description}</p>
           </div>
           <div className="flex items-center gap-3">

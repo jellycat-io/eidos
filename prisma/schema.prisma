@@ -21,7 +21,7 @@ model Form {
   description     String?
   published       Boolean          @default(false)
   content         String           @default("[]")
-  shareUrl        String           @default(uuid())
+  shareUrl        String           @unique() @default(uuid())
   visits          Int              @default(0)
   submissions     Int              @default(0)
   createdAt       DateTime         @default(now())

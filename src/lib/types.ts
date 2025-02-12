@@ -20,6 +20,11 @@ export type ElementAttributesMap = {
 
 export type ElementType = keyof ElementAttributesMap
 
+export type ValidateFn = (
+  element: FormElementInstance<ElementType>,
+  value: string,
+) => string | null
+
 export interface FormElement<T extends ElementType> {
   type: T
   buttonComponent: {
@@ -30,6 +35,7 @@ export interface FormElement<T extends ElementType> {
   designerComponent: React.FC<DesignerComponentProps<T>>
   formComponent: React.FC<FormComponentProps<T>>
   propertiesComponent: React.FC<PropertiesComponentProps<T>>
+  validate: ValidateFn
 }
 
 export type AnyFormElement = { [K in ElementType]: FormElement<K> }[ElementType]
@@ -54,6 +60,9 @@ export interface DesignerComponentProps<T extends ElementType> {
 
 export interface FormComponentProps<T extends ElementType> {
   element: FormElementInstance<T>
+  defaultValue?: string
+  onChange?: (key: string, value: string) => void
+  error?: string | null
 }
 
 export interface PropertiesComponentProps<T extends ElementType> {

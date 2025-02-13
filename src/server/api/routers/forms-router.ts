@@ -146,6 +146,25 @@ export const formsRouter = createTRPCRouter({
     },
   ),
 
+  getFormWithSubmissions: privateProcedure
+    .input(getFormSchema)
+    .query(async ({ ctx, input }) => {
+      const { id } = getFormSchema.parse(input)
+      const form = await ctx.db.form.findUnique({
+        where: {
+          userId: ctx.auth.userId,
+          id,
+        },
+        include: {
+          formSubmissions: true,
+        },
+      })
+
+      if (!form) throw new Error("Form not found")
+
+      return form
+    }),
+
   createForm: privateProcedure
     .input(createFormSchema)
     .mutation(async ({ ctx, input }) => {

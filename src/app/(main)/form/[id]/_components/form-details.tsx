@@ -1,7 +1,17 @@
 "use client"
 
-import { api } from "@/trpc/react"
+import { api, RouterOutputs } from "@/trpc/react"
+import { formatDistance } from "date-fns"
 
+import { ElementType, FormElementInstance } from "@/lib/types"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Loader } from "@/components/loader"
 
 import { FormLinkShare } from "./form-link-share"
@@ -13,7 +23,7 @@ interface FormDetailsProps {
 }
 
 export function FormDetails({ formId }: FormDetailsProps) {
-  const { data: form, isLoading } = api.forms.getFormById.useQuery({
+  const { data: form, isLoading } = api.forms.getFormWithSubmissions.useQuery({
     id: formId,
   })
 
@@ -34,20 +44,98 @@ export function FormDetails({ formId }: FormDetailsProps) {
         <FormStatCards formId={formId} loading={isLoading} />
       </div>
       <div className="my-8 px-8">
-        <SubmissionsTable formId={form.id} />
+        <SubmissionsTable form={form} />
       </div>
     </div>
   )
 }
 
-interface SubmissionsTableProps {
-  formId: string
+type Row = Record<string, string> & {
+  id: string
+  submittedAt: Date
 }
 
-function SubmissionsTable({ formId }: SubmissionsTableProps) {
+interface SubmissionsTableProps {
+  form: RouterOutputs["forms"]["getFormWithSubmissions"]
+}
+
+function SubmissionsTable({ form }: SubmissionsTableProps) {
+  const formElements = JSON.parse(
+    form.content,
+  ) as FormElementInstance<ElementType>[]
+  const columns: {
+    id: string
+    label: string
+    required: boolean
+    type: ElementType
+  }[] = []
+
+  for (const el of formElements) {
+    switch (el.type) {
+      case "TextField":
+      case "NumberField":
+        columns.push({
+          id: el.id,
+          label: el.extraAttributes.label,
+          required: el.extraAttributes.required ?? false,
+          type: el.type,
+        })
+        break
+      default:
+        break
+    }
+  }
+
+  const rows: Row[] = []
+  for (const submission of form.formSubmissions) {
+    const content = JSON.parse(submission.content)
+    rows.push({
+      ...content,
+      id: submission.id,
+      submittedAt: submission.createdAt,
+    })
+  }
+
   return (
-    <>
+    <section className="space-y-4">
       <h1 className="text-2xl font-bold">Submissions</h1>
-    </>
+      <div className="rounded-md border overflow-hidden">
+        <Table>
+          <TableHeader className="bg-accent text-accent-foreground">
+            <TableRow>
+              {columns.map((col) => (
+                <TableHead key={col.id}>{col.label}</TableHead>
+              ))}
+              <TableHead className="text-right">Submitted at</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.id}>
+                {columns.map((col) => (
+                  <RowCell key={col.id} type={col.type} value={row[col.id]} />
+                ))}
+                <TableCell className="text-right">
+                  {formatDistance(row.submittedAt, Date.now(), {
+                    addSuffix: true,
+                  })}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </section>
   )
+}
+
+interface RowCellProps {
+  type: ElementType
+  value: string
+}
+
+function RowCell({ type: _type, value }: RowCellProps) {
+  const node: React.ReactNode = value
+
+  return <TableCell>{node}</TableCell>
 }

@@ -38,6 +38,7 @@ export function PreviewDialogButton() {
           <div className="absolute inset-0 bg-secondary bg-dot-slate-600" />
           <div className="w-full max-w-3xl flex flex-col flex-grow gap-4 bg-background rounded-xl p-6 overflow-y-auto z-10">
             {elements.map((el) => {
+              console.log(el.type)
               const FormComponent = FORM_ELEMENTS[el.type]
                 .formComponent as React.FC<FormComponentProps<typeof el.type>>
 

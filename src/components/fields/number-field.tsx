@@ -5,16 +5,16 @@ import { useForm } from "react-hook-form"
 import { MdNumbers } from "react-icons/md"
 import { z, ZodError } from "zod"
 
-import {
+import type {
+  DesignerComponentProps,
   FormComponentProps,
+  FormElement,
   FormElementInstance,
+  NumberFieldAttributes,
   PropertiesComponentProps,
-  type DesignerComponentProps,
-  type ElementType,
-  type FormElement,
 } from "@/lib/types"
 import { cn } from "@/lib/utils"
-import { optionalString, requiredString } from "@/lib/validation"
+import { NumberFieldAttributesSchema } from "@/lib/validation"
 import { useDesigner } from "@/hooks/use-designer"
 import {
   Form,
@@ -49,7 +49,7 @@ export const NumberFieldFormElement: FormElement<"NumberField"> = {
   designerComponent: DesignerComponent,
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
-  validate: (element: FormElementInstance<ElementType>, value: string) => {
+  validate: (element, value) => {
     try {
       z.string()
         .refine(
@@ -74,9 +74,7 @@ export const NumberFieldFormElement: FormElement<"NumberField"> = {
   },
 }
 
-function DesignerComponent<T extends ElementType>({
-  element,
-}: DesignerComponentProps<T>) {
+function DesignerComponent({ element }: DesignerComponentProps<"NumberField">) {
   const { label, placeholder, required, helperText } = element.extraAttributes
 
   return (
@@ -93,12 +91,12 @@ function DesignerComponent<T extends ElementType>({
   )
 }
 
-function FormComponent<T extends ElementType>({
+function FormComponent({
   element,
   defaultValue,
   onChange,
   error: formError,
-}: FormComponentProps<T>) {
+}: FormComponentProps<"NumberField">) {
   const { label, placeholder, required, helperText } = element.extraAttributes
   const [value, setValue] = useState(defaultValue || "")
   const [error, setError] = useState<string | null>(null)
@@ -118,6 +116,8 @@ function FormComponent<T extends ElementType>({
         onBlur={(e) => {
           if (!onChange) return
           onChange(element.id, e.target.value)
+
+          if (!NumberFieldFormElement.validate) return
           const error = NumberFieldFormElement.validate(
             element as FormElementInstance<"NumberField">,
             e.target.value,
@@ -135,22 +135,13 @@ function FormComponent<T extends ElementType>({
   )
 }
 
-const propertiesFormSchema = z.object({
-  label: requiredString,
-  helperText: optionalString,
-  required: z.boolean().default(false).optional(),
-  placeholder: optionalString,
-})
-
-type PropertiesFormValues = z.infer<typeof propertiesFormSchema>
-
-function PropertiesComponent<T extends ElementType>({
+function PropertiesComponent({
   element,
-}: PropertiesComponentProps<T>) {
+}: PropertiesComponentProps<"NumberField">) {
   const { updateElement } = useDesigner()
-  const form = useForm<PropertiesFormValues>({
+  const form = useForm<NumberFieldAttributes>({
     mode: "onBlur",
-    resolver: zodResolver(propertiesFormSchema),
+    resolver: zodResolver(NumberFieldAttributesSchema),
     defaultValues: {
       ...element.extraAttributes,
     },
@@ -158,7 +149,7 @@ function PropertiesComponent<T extends ElementType>({
 
   useEffect(() => form.reset(element.extraAttributes), [element, form])
 
-  function applyChanges(values: PropertiesFormValues) {
+  function applyChanges(values: NumberFieldAttributes) {
     updateElement(element.id, {
       ...element,
       extraAttributes: {

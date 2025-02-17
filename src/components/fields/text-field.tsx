@@ -5,16 +5,16 @@ import { useForm } from "react-hook-form"
 import { MdTextFields } from "react-icons/md"
 import { z, ZodError } from "zod"
 
-import {
+import type {
+  DesignerComponentProps,
   FormComponentProps,
+  FormElement,
   FormElementInstance,
-  type DesignerComponentProps,
-  type ElementType,
-  type FormElement,
-  type PropertiesComponentProps,
+  PropertiesComponentProps,
+  TextFieldAttributes,
 } from "@/lib/types"
 import { cn } from "@/lib/utils"
-import { optionalString, requiredString } from "@/lib/validation"
+import { TextFieldAttributesSchema } from "@/lib/validation"
 import { useDesigner } from "@/hooks/use-designer"
 import {
   Form,
@@ -68,9 +68,7 @@ export const TextFieldFormElement: FormElement<"TextField"> = {
   },
 }
 
-function DesignerComponent<T extends ElementType>({
-  element,
-}: DesignerComponentProps<T>) {
+function DesignerComponent({ element }: DesignerComponentProps<"TextField">) {
   const { label, placeholder, required, helperText } = element.extraAttributes
 
   return (
@@ -87,12 +85,12 @@ function DesignerComponent<T extends ElementType>({
   )
 }
 
-function FormComponent<T extends ElementType>({
+function FormComponent({
   element,
   defaultValue,
   onChange,
   error: formError,
-}: FormComponentProps<T>) {
+}: FormComponentProps<"TextField">) {
   const { label, placeholder, required, helperText } = element.extraAttributes
   const [value, setValue] = useState(defaultValue || "")
   const [error, setError] = useState<string | null>(null)
@@ -112,6 +110,7 @@ function FormComponent<T extends ElementType>({
           if (!onChange) return
           onChange(element.id, e.target.value)
 
+          if (!TextFieldFormElement.validate) return
           const error = TextFieldFormElement.validate(
             element as FormElementInstance<"TextField">,
             e.target.value,
@@ -129,22 +128,13 @@ function FormComponent<T extends ElementType>({
   )
 }
 
-const propertiesFormSchema = z.object({
-  label: requiredString,
-  helperText: optionalString,
-  required: z.boolean().default(false).optional(),
-  placeholder: optionalString,
-})
-
-type PropertiesFormValues = z.infer<typeof propertiesFormSchema>
-
-function PropertiesComponent<T extends ElementType>({
+function PropertiesComponent({
   element,
-}: PropertiesComponentProps<T>) {
+}: PropertiesComponentProps<"TextField">) {
   const { updateElement } = useDesigner()
-  const form = useForm<PropertiesFormValues>({
+  const form = useForm<TextFieldAttributes>({
     mode: "onBlur",
-    resolver: zodResolver(propertiesFormSchema),
+    resolver: zodResolver(TextFieldAttributesSchema),
     defaultValues: {
       ...element.extraAttributes,
     },
@@ -152,7 +142,7 @@ function PropertiesComponent<T extends ElementType>({
 
   useEffect(() => form.reset(element.extraAttributes), [element, form])
 
-  function applyChanges(values: PropertiesFormValues) {
+  function applyChanges(values: TextFieldAttributes) {
     updateElement(element.id, {
       ...element,
       extraAttributes: {

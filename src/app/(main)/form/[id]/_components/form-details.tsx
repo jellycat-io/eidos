@@ -74,10 +74,13 @@ function SubmissionsTable({ form }: SubmissionsTableProps) {
     switch (el.type) {
       case "TextField":
       case "NumberField":
+        const { label, required } = el.extraAttributes as FormElementInstance<
+          typeof el.type
+        >["extraAttributes"]
         columns.push({
           id: el.id,
-          label: el.extraAttributes.label,
-          required: el.extraAttributes.required ?? false,
+          label,
+          required: required ?? false,
           type: el.type,
         })
         break

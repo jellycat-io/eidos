@@ -1,18 +1,32 @@
 import { z } from "zod"
 
-export const ElementAttributesSchema = z.object({
+export const TextFieldAttributesSchema = z.object({
   label: z.string(),
   helperText: z.string().optional(),
   required: z.boolean().optional(),
-})
-
-export const TextFieldAttributesSchema = ElementAttributesSchema.extend({
   placeholder: z.string().optional(),
 })
 
-export const NumberFieldAttributesSchema = ElementAttributesSchema.extend({
+export const NumberFieldAttributesSchema = z.object({
+  label: z.string(),
+  helperText: z.string().optional(),
+  required: z.boolean().optional(),
   placeholder: z.string().optional(),
 })
+
+export const HeadingAttributesSchema = z.object({
+  title: z.string(),
+})
+
+export const SubHeadingAttributesSchema = z.object({
+  title: z.string(),
+})
+
+export const ParagraphAttributesSchema = z.object({
+  text: z.string(),
+})
+
+export const SeparatorAttributesSchema = z.object({})
 
 export const FormElementInstanceSchema = z.discriminatedUnion("type", [
   z.object({
@@ -24,6 +38,26 @@ export const FormElementInstanceSchema = z.discriminatedUnion("type", [
     id: z.string(),
     type: z.literal("NumberField"),
     extraAttributes: NumberFieldAttributesSchema,
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("Heading"),
+    extraAttributes: HeadingAttributesSchema,
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("SubHeading"),
+    extraAttributes: SubHeadingAttributesSchema,
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("Paragraph"),
+    extraAttributes: ParagraphAttributesSchema,
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("Separator"),
+    extraAttributes: SeparatorAttributesSchema,
   }),
 ])
 

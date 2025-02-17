@@ -18,7 +18,7 @@ export function PropertiesSidebar() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-4 pt-4 pb-2">
         <p>Element properties</p>
         <Button
           size="icon"
@@ -28,9 +28,10 @@ export function PropertiesSidebar() {
           <XIcon />
         </Button>
       </div>
-
       <Separator className="mb-4" />
-      <PropertiesComponent element={selectedElement} />
+      <div className="px-4">
+        <PropertiesComponent element={selectedElement} />
+      </div>
     </div>
   )
 }

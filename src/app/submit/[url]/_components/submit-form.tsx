@@ -6,7 +6,7 @@ import { api } from "@/trpc/react"
 import { MousePointerClickIcon } from "lucide-react"
 
 import { FORM_ELEMENTS } from "@/lib/constants"
-import type { FormComponentProps } from "@/lib/types"
+import type { FormComponentProps, FormElement } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -50,8 +50,11 @@ export function SubmitForm({ formUrl }: SubmitFormProps) {
   const validateForm: () => boolean = useCallback(() => {
     if (!formData) return false
     for (const field of formData?.elements) {
+      const el = FORM_ELEMENTS[field.type] as FormElement<typeof field.type>
+      if (!el.validate) continue
+
       const value = formValues.current[field.id]
-      const err = FORM_ELEMENTS[field.type].validate(field, value)
+      const err = el.validate(field, value)
       if (err) {
         formErrors.current[field.id] = err
       }
